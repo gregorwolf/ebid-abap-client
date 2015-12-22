@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v0.2-alpha">
+ <T100A>
+  <ARBGB>ZEBID</ARBGB>
+  <MASTERLANG>E</MASTERLANG>
+  <APPLCLASS></APPLCLASS>
+  <RESPUSER></RESPUSER>
+  <LASTUSER></LASTUSER>
+  <LDATE>00000000</LDATE>
+  <LTIME>000000</LTIME>
+  <STEXT>EBID ABAP Client</STEXT>
+ </T100A>
+ <T100>
+  <T100>
+   <SPRSL>E</SPRSL>
+   <ARBGB>ZEBID</ARBGB>
+   <MSGNR>000</MSGNR>
+   <TEXT>&amp;</TEXT>
+  </T100>
+ </T100>
+</abapGit>
