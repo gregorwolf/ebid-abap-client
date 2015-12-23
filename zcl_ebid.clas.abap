@@ -21,6 +21,7 @@ CLASS zcl_ebid DEFINITION
     CLASS-METHODS get_gguid
       RETURNING
         VALUE(rv_gguid) TYPE suid_uuid.
+    class-METHODS copyright.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -67,6 +68,23 @@ CLASS ZCL_EBID IMPLEMENTATION.
     CREATE OBJECT me->rest_client
       EXPORTING
         io_http_client = me->http_client.    " HTTP Client Object
+  ENDMETHOD.
+
+
+  METHOD copyright.
+
+*--------------------------------------------------------------------*
+*
+* EBID ABAP client
+* Copyright (C) 2015 Gregor Wolf
+*
+* Project home: https://github.com/gregorwolf/ebid-abap-client
+*
+* Published under Apache License, Version 2.0
+* http://www.apache.org/licenses/LICENSE-2.0.html
+*
+*--------------------------------------------------------------------*
+
   ENDMETHOD.
 
 

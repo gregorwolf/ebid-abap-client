@@ -9,6 +9,7 @@ CLASS ltcl_ebid DEFINITION FINAL FOR TESTING
       test_connection FOR TESTING RAISING cx_static_check,
       get_match FOR TESTING RAISING cx_static_check,
       genterate_gguid FOR TESTING RAISING cx_static_check.
+
     DATA: lo_ebid TYPE REF TO zcl_ebid,
           ex      TYPE REF TO zcx_ebid.
 
