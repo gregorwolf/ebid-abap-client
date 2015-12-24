@@ -9,6 +9,7 @@ CLASS ltcl_ebid DEFINITION FINAL FOR TESTING
       test_connection FOR TESTING RAISING cx_static_check,
       get_match FOR TESTING RAISING cx_static_check,
       get_company FOR TESTING RAISING cx_static_check,
+      search FOR TESTING RAISING cx_static_check,
       genterate_gguid FOR TESTING RAISING cx_static_check.
 
     DATA: lo_ebid TYPE REF TO zcl_ebid,
@@ -125,6 +126,23 @@ CLASS ltcl_ebid IMPLEMENTATION.
     cl_aunit_assert=>assert_not_initial(
       EXPORTING
         act              = ls_company_res   " Actual Data Object
+    ).
+
+  ENDMETHOD.
+
+  METHOD search.
+    DATA: ls_search_req TYPE zebid_match_request,
+          ls_search_res type zebid_search_response.
+
+    CREATE OBJECT lo_ebid.
+    ls_search_req-company_name = 'Bosch Siemens'.
+    ls_search_req-city         = 'München'.
+
+    ls_search_res = lo_ebid->search( ls_search_req ).
+
+    cl_aunit_assert=>assert_not_initial(
+      EXPORTING
+        act              = ls_search_res   " Actual Data Object
     ).
 
   ENDMETHOD.

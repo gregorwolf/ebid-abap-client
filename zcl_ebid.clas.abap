@@ -25,13 +25,23 @@ CLASS zcl_ebid DEFINITION
         VALUE(rs_company_response) TYPE zebid_company_response
       RAISING
         zcx_ebid.
+    METHODS search
+      IMPORTING
+        is_search_request             TYPE zebid_match_request
+      RETURNING
+        VALUE(rs_search_response) TYPE zebid_search_response
+      RAISING
+        zcx_ebid.
     CLASS-METHODS get_gguid
       RETURNING
         VALUE(rv_gguid) TYPE suid_uuid.
-    class-METHODS copyright.
+    CLASS-METHODS copyright.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
+    CONSTANTS: c_search_path TYPE string VALUE '/ws/search/rest/v1.0/',
+               c_company_path TYPE string VALUE '/ws/company/rest/v1.0/',
+               c_match_path TYPE string VALUE '/ws/match/rest/v1.0/authorization-test'.
     DATA http_client TYPE REF TO if_http_client.
     DATA rest_client TYPE REF TO cl_rest_http_client.
     DATA msg TYPE string.
@@ -41,6 +51,14 @@ CLASS zcl_ebid DEFINITION
     METHODS post
       IMPORTING
         iv_data type string.
+    METHODS post_match_or_search
+      IMPORTING
+        is_match_request TYPE zebid_match_request.
+    METHODS process_error
+      IMPORTING
+        iv_json_res TYPE string
+      RAISING
+        zcx_ebid.
 ENDCLASS.
 
 
@@ -103,12 +121,10 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
   METHOD get_company.
 
-    CONSTANTS: lc_company_path TYPE string VALUE '/ws/company/rest/v1.0/'.
-
     DATA: lv_path  TYPE string,
           ls_error TYPE zebid_error.
 
-    lv_path = lc_company_path && iv_ebid.
+    lv_path = c_company_path && iv_ebid.
 
     me->rest_client->if_rest_client~set_request_header(
       EXPORTING
@@ -166,43 +182,19 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
 
   METHOD match.
-    DATA: ls_match_req TYPE zebid_match_request,
-          ls_error     TYPE zebid_error.
-    CONSTANTS: lc_match_path TYPE string VALUE '/ws/match/rest/v1.0/'.
-
-    ls_match_req = is_match_request.
-    ls_match_req-gguid = zcl_ebid=>get_gguid( ).
-
-    DATA(lv_json) = /ui2/cl_json=>serialize(
-      EXPORTING
-        data        = ls_match_req
-        compress    = abap_false
-        pretty_name = abap_true
-    ).
-
     me->rest_client->if_rest_client~set_request_header(
       EXPORTING
         iv_name  = if_http_header_fields_sap=>request_uri
-        iv_value = lc_match_path
+        iv_value = c_match_path
     ).
 
-    me->post( lv_json ).
+    post_match_or_search( is_match_request ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
     DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
     DATA(lv_json_res) = lo_entity->get_string_data( ).
 
     IF lv_status <> 200.
-      /ui2/cl_json=>deserialize(
-        EXPORTING
-          json        = lv_json_res    " JSON string
-          pretty_name = abap_true    " Pretty Print property names
-        CHANGING
-          data        = ls_error    " Data to serialize
-      ).
-      RAISE EXCEPTION TYPE zcx_ebid
-        EXPORTING
-          textid         = zcx_ebid=>generic_error
-          exception_text = ls_error-errormessage.
+      process_error( lv_json_res ).
     ENDIF.
 
     /ui2/cl_json=>deserialize(
@@ -223,6 +215,71 @@ CLASS ZCL_EBID IMPLEMENTATION.
     ).
     lo_entity->set_string_data( iv_data ).
     me->rest_client->if_rest_client~post( io_entity = lo_entity ).
+  ENDMETHOD.
+
+
+  METHOD post_match_or_search.
+
+    DATA ls_match_req TYPE zebid_match_request.
+
+    ls_match_req = is_match_request.
+    ls_match_req-gguid = zcl_ebid=>get_gguid( ).
+
+    DATA(lv_json)  = /ui2/cl_json=>serialize(
+                       EXPORTING
+                         data        = ls_match_req
+                         compress    = abap_false
+                         pretty_name = abap_true
+                      ).
+    me->post( lv_json ).
+  ENDMETHOD.
+
+
+  METHOD process_error.
+
+    DATA ls_error TYPE zebid_error.
+
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json        = iv_json_res    " JSON string
+        pretty_name = abap_true    " Pretty Print property names
+      CHANGING
+        data        = ls_error    " Data to serialize
+    ).
+    RAISE EXCEPTION TYPE zcx_ebid
+      EXPORTING
+        textid         = zcx_ebid=>generic_error
+        exception_text = ls_error-errormessage.
+
+
+  ENDMETHOD.
+
+
+  METHOD search.
+
+    me->rest_client->if_rest_client~set_request_header(
+      EXPORTING
+        iv_name  = if_http_header_fields_sap=>request_uri
+        iv_value = c_search_path
+    ).
+
+    post_match_or_search( is_search_request ).
+    DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
+    DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
+    DATA(lv_json_res) = lo_entity->get_string_data( ).
+
+    IF lv_status <> 200.
+      process_error( lv_json_res ).
+    ENDIF.
+
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json        = lv_json_res    " JSON string
+        pretty_name = abap_true    " Pretty Print property names
+      CHANGING
+        data        = rs_search_response    " Data to serialize
+    ).
+
   ENDMETHOD.
 
 
@@ -247,12 +304,10 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
   METHOD test_connection.
 
-    CONSTANTS: lc_match_path TYPE string VALUE '/ws/match/rest/v1.0/authorization-test'.
-
     me->rest_client->if_rest_client~set_request_header(
       EXPORTING
         iv_name  = if_http_header_fields_sap=>request_uri
-        iv_value = lc_match_path
+        iv_value = c_match_path
     ).
     me->get( ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
