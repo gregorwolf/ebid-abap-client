@@ -86,7 +86,15 @@ CLASS ltcl_ebid IMPLEMENTATION.
     CLEAR: lo_ebid.
     CREATE OBJECT lo_ebid.
     ls_match_req-street       = 'Marcel-Breuer-Str. 6'.
-    lt_match_res = lo_ebid->match( ls_match_req ).
+    TRY.
+        lt_match_res = lo_ebid->match( ls_match_req ).
+      CATCH zcx_ebid INTO ex.
+        cl_aunit_assert=>assert_not_bound(
+          EXPORTING
+            act              = ex    " Reference Variable to Be Checked
+            msg              = ex->get_text( )   " Error Message
+        ).
+    ENDTRY.
 
     cl_aunit_assert=>assert_not_initial(
       EXPORTING
@@ -143,6 +151,14 @@ CLASS ltcl_ebid IMPLEMENTATION.
     cl_aunit_assert=>assert_not_initial(
       EXPORTING
         act              = ls_search_res   " Actual Data Object
+    ).
+
+    describe TABLE ls_search_res-suggestion lines data(lv_lines).
+
+    cl_aunit_assert=>assert_equals(
+      EXPORTING
+        exp                  = 10    " Data Object with Expected Type
+        act                  = lv_lines    " Data Object with Current Value
     ).
 
   ENDMETHOD.

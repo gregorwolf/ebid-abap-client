@@ -39,9 +39,10 @@ CLASS zcl_ebid DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    CONSTANTS: c_search_path TYPE string VALUE '/ws/search/rest/v1.0/',
+    CONSTANTS: c_search_path  TYPE string VALUE '/ws/search/rest/v1.0/',
                c_company_path TYPE string VALUE '/ws/company/rest/v1.0/',
-               c_match_path TYPE string VALUE '/ws/match/rest/v1.0/authorization-test'.
+               c_test_path    TYPE string VALUE '/ws/match/rest/v1.0/authorization-test',
+               c_match_path   TYPE string VALUE '/ws/match/rest/v1.0/'.
     DATA http_client TYPE REF TO if_http_client.
     DATA rest_client TYPE REF TO cl_rest_http_client.
     DATA msg TYPE string.
@@ -307,7 +308,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
     me->rest_client->if_rest_client~set_request_header(
       EXPORTING
         iv_name  = if_http_header_fields_sap=>request_uri
-        iv_value = c_match_path
+        iv_value = c_test_path
     ).
     me->get( ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
