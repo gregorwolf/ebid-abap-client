@@ -8,6 +8,7 @@ CLASS ltcl_ebid DEFINITION FINAL FOR TESTING
       instanciate_ebid FOR TESTING RAISING cx_static_check,
       test_connection FOR TESTING RAISING cx_static_check,
       get_match FOR TESTING RAISING cx_static_check,
+      get_company FOR TESTING RAISING cx_static_check,
       genterate_gguid FOR TESTING RAISING cx_static_check.
 
     DATA: lo_ebid TYPE REF TO zcl_ebid,
@@ -97,6 +98,33 @@ CLASS ltcl_ebid IMPLEMENTATION.
       EXPORTING
         exp                  =  1   " Data Object with Expected Type
         act                  =  lv_lines   " Data Object with Current Value
+    ).
+
+  ENDMETHOD.
+
+  METHOD get_company.
+    DATA: lv_ebid        TYPE string VALUE '508838560133', " Invalid EBID
+          ls_company_res TYPE zebid_company_response.
+
+    CREATE OBJECT lo_ebid.
+
+    TRY.
+        ls_company_res = lo_ebid->get_company( lv_ebid ).
+      CATCH zcx_ebid INTO DATA(ex).
+        cl_aunit_assert=>assert_bound(
+          EXPORTING
+            act              = ex   " Reference Variable to Be Checked
+        ).
+    ENDTRY.
+
+    CLEAR: lo_ebid, ls_company_res.
+    CREATE OBJECT lo_ebid.
+    lv_ebid = '2508838560133'.
+    ls_company_res = lo_ebid->get_company( lv_ebid ).
+
+    cl_aunit_assert=>assert_not_initial(
+      EXPORTING
+        act              = ls_company_res   " Actual Data Object
     ).
 
   ENDMETHOD.

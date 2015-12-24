@@ -18,6 +18,13 @@ CLASS zcl_ebid DEFINITION
         VALUE(rt_match_response) TYPE zebid_match_response_t
       RAISING
         zcx_ebid.
+    METHODS get_company
+      IMPORTING
+        iv_ebid                    TYPE string
+      RETURNING
+        VALUE(rs_company_response) TYPE zebid_company_response
+      RAISING
+        zcx_ebid.
     CLASS-METHODS get_gguid
       RETURNING
         VALUE(rv_gguid) TYPE suid_uuid.
@@ -91,6 +98,51 @@ CLASS ZCL_EBID IMPLEMENTATION.
   METHOD get.
     me->set_headers( ).
     me->rest_client->if_rest_client~get( ).
+  ENDMETHOD.
+
+
+  METHOD get_company.
+
+    CONSTANTS: lc_company_path TYPE string VALUE '/ws/company/rest/v1.0/'.
+
+    DATA: lv_path  TYPE string,
+          ls_error TYPE zebid_error.
+
+    lv_path = lc_company_path && iv_ebid.
+
+    me->rest_client->if_rest_client~set_request_header(
+      EXPORTING
+        iv_name  = if_http_header_fields_sap=>request_uri
+        iv_value = lv_path
+    ).
+
+    me->get( ).
+    DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
+    DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
+    DATA(lv_json_res) = lo_entity->get_string_data( ).
+
+    IF lv_status <> 200.
+      /ui2/cl_json=>deserialize(
+        EXPORTING
+          json        = lv_json_res    " JSON string
+          pretty_name = abap_true    " Pretty Print property names
+        CHANGING
+          data        = ls_error    " Data to serialize
+      ).
+      RAISE EXCEPTION TYPE zcx_ebid
+        EXPORTING
+          textid         = zcx_ebid=>generic_error
+          exception_text = ls_error-errormessage.
+    ENDIF.
+
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json        = lv_json_res    " JSON string
+        pretty_name = abap_true    " Pretty Print property names
+      CHANGING
+        data        = rs_company_response    " Data to serialize
+    ).
+
   ENDMETHOD.
 
 
@@ -195,12 +247,12 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
   METHOD test_connection.
 
-    CONSTANTS: lc_test_path TYPE string VALUE '/ws/match/rest/v1.0/authorization-test'.
+    CONSTANTS: lc_match_path TYPE string VALUE '/ws/match/rest/v1.0/authorization-test'.
 
     me->rest_client->if_rest_client~set_request_header(
       EXPORTING
         iv_name  = if_http_header_fields_sap=>request_uri
-        iv_value = lc_test_path
+        iv_value = lc_match_path
     ).
     me->get( ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
