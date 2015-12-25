@@ -10,6 +10,7 @@ CLASS ltcl_ebid DEFINITION FINAL FOR TESTING
       get_match FOR TESTING RAISING cx_static_check,
       get_company FOR TESTING RAISING cx_static_check,
       search FOR TESTING RAISING cx_static_check,
+      search_as_you_type FOR TESTING RAISING cx_static_check,
       genterate_gguid FOR TESTING RAISING cx_static_check.
 
     DATA: lo_ebid TYPE REF TO zcl_ebid,
@@ -159,6 +160,19 @@ CLASS ltcl_ebid IMPLEMENTATION.
       EXPORTING
         exp                  = 10    " Data Object with Expected Type
         act                  = lv_lines    " Data Object with Current Value
+    ).
+
+  ENDMETHOD.
+
+  METHOD search_as_you_type.
+    data: lv_query type string VALUE 'OSRA'.
+
+    CREATE OBJECT lo_ebid.
+    data(lt_result) = lo_ebid->search_as_you_type( lv_query ).
+
+    cl_aunit_assert=>assert_not_initial(
+      EXPORTING
+        act              = lt_result   " Actual Data Object
     ).
 
   ENDMETHOD.

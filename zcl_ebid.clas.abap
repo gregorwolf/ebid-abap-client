@@ -32,6 +32,13 @@ CLASS zcl_ebid DEFINITION
         VALUE(rs_search_response) TYPE zebid_search_response
       RAISING
         zcx_ebid.
+    METHODS search_as_you_type
+      IMPORTING
+        iv_query         TYPE string
+      RETURNING
+        VALUE(rt_result) TYPE string_table
+      RAISING
+        zcx_ebid.
     CLASS-METHODS get_gguid
       RETURNING
         VALUE(rv_gguid) TYPE suid_uuid.
@@ -42,7 +49,8 @@ CLASS zcl_ebid DEFINITION
     CONSTANTS: c_search_path  TYPE string VALUE '/ws/search/rest/v1.0/',
                c_company_path TYPE string VALUE '/ws/company/rest/v1.0/',
                c_test_path    TYPE string VALUE '/ws/match/rest/v1.0/authorization-test',
-               c_match_path   TYPE string VALUE '/ws/match/rest/v1.0/'.
+               c_match_path   TYPE string VALUE '/ws/match/rest/v1.0/',
+               c_search_as_you_type_path type string VALUE '/ws/search/rest/v2.0/search-as-you-type?q='.
     DATA http_client TYPE REF TO if_http_client.
     DATA rest_client TYPE REF TO cl_rest_http_client.
     DATA msg TYPE string.
@@ -279,6 +287,36 @@ CLASS ZCL_EBID IMPLEMENTATION.
         pretty_name = abap_true    " Pretty Print property names
       CHANGING
         data        = rs_search_response    " Data to serialize
+    ).
+
+  ENDMETHOD.
+
+
+  METHOD search_as_you_type.
+    DATA: lv_path TYPE string.
+
+    lv_path = c_search_as_you_type_path && iv_query.
+
+    me->rest_client->if_rest_client~set_request_header(
+      EXPORTING
+        iv_name  = if_http_header_fields_sap=>request_uri
+        iv_value = lv_path
+    ).
+    me->get( ).
+    DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
+    DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
+    DATA(lv_json_res) = lo_entity->get_string_data( ).
+
+    IF lv_status <> 200.
+      process_error( lv_json_res ).
+    ENDIF.
+
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json        = lv_json_res    " JSON string
+        pretty_name = abap_true    " Pretty Print property names
+      CHANGING
+        data        = rt_result    " Data to serialize
     ).
 
   ENDMETHOD.
