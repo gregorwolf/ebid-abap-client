@@ -29,10 +29,12 @@ CLASS ltcl_ebid IMPLEMENTATION.
           EXPORTING
             act              = lo_ebid  " Reference Variable to Be Checked
         ).
+
         CLEAR: lo_ebid.
         CREATE OBJECT lo_ebid
           EXPORTING
             iv_destination = 'NON_EXISTING_EBID_DESTINATON'.
+
       CATCH zcx_ebid INTO ex.
         cl_aunit_assert=>assert_bound(
           EXPORTING
@@ -46,6 +48,13 @@ CLASS ltcl_ebid IMPLEMENTATION.
     CREATE OBJECT lo_ebid.
 
     DATA(lv_ok) = lo_ebid->test_connection( ).
+    cl_aunit_assert=>assert_equals(
+      EXPORTING
+        exp                  = abap_true    " Data Object with Expected Type
+        act                  = lv_ok   " Data Object with Current Value
+    ).
+    " second call should not fail
+    lv_ok = lo_ebid->test_connection( ).
     cl_aunit_assert=>assert_equals(
       EXPORTING
         exp                  = abap_true    " Data Object with Expected Type
@@ -84,8 +93,6 @@ CLASS ltcl_ebid IMPLEMENTATION.
         ).
     ENDTRY.
 
-    CLEAR: lo_ebid.
-    CREATE OBJECT lo_ebid.
     ls_match_req-street       = 'Marcel-Breuer-Str. 6'.
     TRY.
         lt_match_res = lo_ebid->match( ls_match_req ).
@@ -127,8 +134,6 @@ CLASS ltcl_ebid IMPLEMENTATION.
         ).
     ENDTRY.
 
-    CLEAR: lo_ebid, ls_company_res.
-    CREATE OBJECT lo_ebid.
     lv_ebid = '2508838560133'.
     ls_company_res = lo_ebid->get_company( lv_ebid ).
 

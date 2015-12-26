@@ -51,18 +51,33 @@ CLASS zcl_ebid DEFINITION
                c_test_path    TYPE string VALUE '/ws/match/rest/v1.0/authorization-test',
                c_match_path   TYPE string VALUE '/ws/match/rest/v1.0/',
                c_search_as_you_type_path type string VALUE '/ws/search/rest/v2.0/search-as-you-type?q='.
+    DATA destination TYPE pficf_destination_name.
     DATA http_client TYPE REF TO if_http_client.
     DATA rest_client TYPE REF TO cl_rest_http_client.
     DATA msg TYPE string.
 
-    METHODS set_headers.
-    METHODS get.
+    METHODS prepare_request
+      IMPORTING
+        iv_path type string
+      RAISING
+        zcx_ebid.
+    METHODS get
+      IMPORTING
+        iv_path type string
+      RAISING
+        zcx_ebid.
     METHODS post
       IMPORTING
-        iv_data type string.
+        iv_path type string
+        iv_data type string
+      RAISING
+        zcx_ebid.
     METHODS post_match_or_search
       IMPORTING
-        is_match_request TYPE zebid_match_request.
+        iv_path type string
+        is_match_request TYPE zebid_match_request
+      RAISING
+        zcx_ebid.
     METHODS process_error
       IMPORTING
         iv_json_res TYPE string
@@ -76,32 +91,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
 
   METHOD constructor.
-    cl_http_client=>create_by_destination(
-      EXPORTING
-        destination              = iv_destination    " Logical destination (specified in function call)
-      IMPORTING
-        client                   = me->http_client    " HTTP Client Abstraction
-      EXCEPTIONS
-        argument_not_found       = 1
-        destination_not_found    = 2
-        destination_no_authority = 3
-        plugin_not_active        = 4
-        internal_error           = 5
-        OTHERS                   = 6
-    ).
-    IF sy-subrc <> 0.
-      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
-                 WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4
-                 INTO msg.
-      RAISE EXCEPTION TYPE zcx_ebid
-        EXPORTING
-          textid         = zcx_ebid=>generic_error
-          exception_text = msg.
-    ENDIF.
-
-    CREATE OBJECT me->rest_client
-      EXPORTING
-        io_http_client = me->http_client.    " HTTP Client Object
+    me->destination = iv_destination.
   ENDMETHOD.
 
 
@@ -123,7 +113,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
 
   METHOD get.
-    me->set_headers( ).
+    me->prepare_request( iv_path ).
     me->rest_client->if_rest_client~get( ).
   ENDMETHOD.
 
@@ -135,13 +125,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
     lv_path = c_company_path && iv_ebid.
 
-    me->rest_client->if_rest_client~set_request_header(
-      EXPORTING
-        iv_name  = if_http_header_fields_sap=>request_uri
-        iv_value = lv_path
-    ).
-
-    me->get( ).
+    me->get( lv_path ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
     DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
     DATA(lv_json_res) = lo_entity->get_string_data( ).
@@ -191,13 +175,8 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
 
   METHOD match.
-    me->rest_client->if_rest_client~set_request_header(
-      EXPORTING
-        iv_name  = if_http_header_fields_sap=>request_uri
-        iv_value = c_match_path
-    ).
 
-    post_match_or_search( is_match_request ).
+    post_match_or_search( iv_path = c_match_path is_match_request = is_match_request ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
     DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
     DATA(lv_json_res) = lo_entity->get_string_data( ).
@@ -218,7 +197,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
 
   METHOD post.
-    me->set_headers( ).
+    me->prepare_request( iv_path ).
     data(lo_entity) = me->rest_client->if_rest_client~create_request_entity(
 *        iv_multipart = ABAP_FALSE
     ).
@@ -240,7 +219,63 @@ CLASS ZCL_EBID IMPLEMENTATION.
                          compress    = abap_false
                          pretty_name = abap_true
                       ).
-    me->post( lv_json ).
+    me->post( iv_path = iv_path iv_data = lv_json ).
+  ENDMETHOD.
+
+
+  METHOD prepare_request.
+    IF me->http_client IS BOUND.
+      CLEAR: me->http_client.
+    ENDIF.
+
+    cl_http_client=>create_by_destination(
+      EXPORTING
+        destination              = me->destination    " Logical destination (specified in function call)
+      IMPORTING
+        client                   = me->http_client    " HTTP Client Abstraction
+      EXCEPTIONS
+        argument_not_found       = 1
+        destination_not_found    = 2
+        destination_no_authority = 3
+        plugin_not_active        = 4
+        internal_error           = 5
+        OTHERS                   = 6
+    ).
+
+    IF sy-subrc <> 0.
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                 WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4
+                 INTO msg.
+      RAISE EXCEPTION TYPE zcx_ebid
+        EXPORTING
+          textid         = zcx_ebid=>generic_error
+          exception_text = msg.
+    ENDIF.
+
+    CREATE OBJECT me->rest_client
+      EXPORTING
+        io_http_client = me->http_client.    " HTTP Client Object
+
+    me->rest_client->if_rest_client~set_request_header(
+      EXPORTING
+        iv_name  = if_http_header_fields_sap=>request_uri
+        iv_value = iv_path
+    ).
+    me->rest_client->if_rest_client~set_request_header(
+      EXPORTING
+        iv_name  = if_http_header_fields=>content_type
+        iv_value = 'application/json; charset=utf-8'
+    ).
+    me->rest_client->if_rest_client~set_request_header(
+      EXPORTING
+        iv_name  = if_http_header_fields=>accept
+        iv_value = 'application/json'
+    ).
+    me->rest_client->if_rest_client~set_request_header(
+      EXPORTING
+        iv_name  = if_http_header_fields=>accept_encoding
+        iv_value = 'charset=utf-8'
+    ).
   ENDMETHOD.
 
 
@@ -266,13 +301,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
   METHOD search.
 
-    me->rest_client->if_rest_client~set_request_header(
-      EXPORTING
-        iv_name  = if_http_header_fields_sap=>request_uri
-        iv_value = c_search_path
-    ).
-
-    post_match_or_search( is_search_request ).
+    post_match_or_search( iv_path = c_search_path is_match_request = is_search_request ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
     DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
     DATA(lv_json_res) = lo_entity->get_string_data( ).
@@ -297,12 +326,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
     lv_path = c_search_as_you_type_path && iv_query.
 
-    me->rest_client->if_rest_client~set_request_header(
-      EXPORTING
-        iv_name  = if_http_header_fields_sap=>request_uri
-        iv_value = lv_path
-    ).
-    me->get( ).
+    me->get( lv_path ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
     DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
     DATA(lv_json_res) = lo_entity->get_string_data( ).
@@ -322,33 +346,9 @@ CLASS ZCL_EBID IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD set_headers.
-    me->rest_client->if_rest_client~set_request_header(
-      EXPORTING
-        iv_name  = if_http_header_fields=>content_type
-        iv_value = 'application/json; charset=utf-8'
-    ).
-    me->rest_client->if_rest_client~set_request_header(
-      EXPORTING
-        iv_name  = if_http_header_fields=>accept
-        iv_value = 'application/json'
-    ).
-    me->rest_client->if_rest_client~set_request_header(
-      EXPORTING
-        iv_name  = if_http_header_fields=>accept_encoding
-        iv_value = 'charset=utf-8'
-    ).
-  ENDMETHOD.
-
-
   METHOD test_connection.
 
-    me->rest_client->if_rest_client~set_request_header(
-      EXPORTING
-        iv_name  = if_http_header_fields_sap=>request_uri
-        iv_value = c_test_path
-    ).
-    me->get( ).
+    me->get( c_test_path ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
     IF lv_status = '200'.
       rv_ok = abap_true.
