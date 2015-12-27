@@ -50,7 +50,8 @@ CLASS zcl_ebid DEFINITION
                c_company_path TYPE string VALUE '/ws/company/rest/v1.0/',
                c_test_path    TYPE string VALUE '/ws/match/rest/v1.0/authorization-test',
                c_match_path   TYPE string VALUE '/ws/match/rest/v1.0/',
-               c_search_as_you_type_path type string VALUE '/ws/search/rest/v2.0/search-as-you-type?q='.
+               c_search_as_you_type_path TYPE string VALUE '/ws/search/rest/v2.0/search-as-you-type?q=',
+               c_http_status_200 TYPE i VALUE 200.
     DATA destination TYPE pficf_destination_name.
     DATA http_client TYPE REF TO if_http_client.
     DATA rest_client TYPE REF TO cl_rest_http_client.
@@ -58,23 +59,23 @@ CLASS zcl_ebid DEFINITION
 
     METHODS prepare_request
       IMPORTING
-        iv_path type string
+        iv_path TYPE string
       RAISING
         zcx_ebid.
     METHODS get
       IMPORTING
-        iv_path type string
+        iv_path TYPE string
       RAISING
         zcx_ebid.
     METHODS post
       IMPORTING
-        iv_path type string
-        iv_data type string
+        iv_path TYPE string
+        iv_data TYPE string
       RAISING
         zcx_ebid.
     METHODS post_match_or_search
       IMPORTING
-        iv_path type string
+        iv_path          TYPE string
         is_match_request TYPE zebid_match_request
       RAISING
         zcx_ebid.
@@ -130,7 +131,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
     DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
     DATA(lv_json_res) = lo_entity->get_string_data( ).
 
-    IF lv_status <> if_http_status=>reason_200.
+    IF lv_status <> c_http_status_200.
       /ui2/cl_json=>deserialize(
         EXPORTING
           json        = lv_json_res    " JSON string
@@ -181,7 +182,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
     DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
     DATA(lv_json_res) = lo_entity->get_string_data( ).
 
-    IF lv_status <> if_http_status=>reason_200.
+    IF lv_status <> c_http_status_200.
       process_error( lv_json_res ).
     ENDIF.
 
@@ -302,7 +303,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
     DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
     DATA(lv_json_res) = lo_entity->get_string_data( ).
 
-    IF lv_status <> if_http_status=>reason_200.
+    IF lv_status <> c_http_status_200.
       process_error( lv_json_res ).
     ENDIF.
 
@@ -327,7 +328,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
     DATA(lo_entity) = me->rest_client->if_rest_client~get_response_entity( ).
     DATA(lv_json_res) = lo_entity->get_string_data( ).
 
-    IF lv_status <> if_http_status=>reason_200.
+    IF lv_status <> c_http_status_200.
       process_error( lv_json_res ).
     ENDIF.
 
@@ -346,7 +347,7 @@ CLASS ZCL_EBID IMPLEMENTATION.
 
     me->get( c_test_path ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).
-    IF lv_status = if_http_status=>reason_200.
+    IF lv_status = c_http_status_200.
       rv_ok = abap_true.
     ELSE.
       rv_ok = abap_false.
