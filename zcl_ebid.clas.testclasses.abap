@@ -24,22 +24,20 @@ CLASS ltcl_ebid IMPLEMENTATION.
   METHOD instanciate_ebid.
 
     TRY.
-        CREATE OBJECT lo_ebid.
-        cl_aunit_assert=>assert_bound(
-          EXPORTING
-            act              = lo_ebid  " Reference Variable to Be Checked
-        ).
+      CREATE OBJECT lo_ebid.
+      cl_aunit_assert=>assert_bound(
+        act              = lo_ebid  " Reference Variable to Be Checked
+      ).
 
-        CLEAR: lo_ebid.
-        CREATE OBJECT lo_ebid
-          EXPORTING
-            iv_destination = 'NON_EXISTING_EBID_DESTINATON'.
+      CLEAR: lo_ebid.
+      CREATE OBJECT lo_ebid
+        EXPORTING
+          iv_destination = 'NON_EXISTING_EBID_DESTINATON'.
 
-      CATCH zcx_ebid INTO ex.
-        cl_aunit_assert=>assert_bound(
-          EXPORTING
-            act              = ex   " Reference Variable to Be Checked
-        ).
+    CATCH zcx_ebid INTO ex.
+      cl_aunit_assert=>assert_bound(
+        act              = ex   " Reference Variable to Be Checked
+      ).
     ENDTRY.
   ENDMETHOD.
 
@@ -49,28 +47,25 @@ CLASS ltcl_ebid IMPLEMENTATION.
 
     DATA(lv_ok) = lo_ebid->test_connection( ).
     cl_aunit_assert=>assert_equals(
-      EXPORTING
-        exp                  = abap_true    " Data Object with Expected Type
-        act                  = lv_ok   " Data Object with Current Value
+      exp                  = abap_true    " Data Object with Expected Type
+      act                  = lv_ok   " Data Object with Current Value
     ).
     " second call should not fail
     lv_ok = lo_ebid->test_connection( ).
     cl_aunit_assert=>assert_equals(
-      EXPORTING
-        exp                  = abap_true    " Data Object with Expected Type
-        act                  = lv_ok   " Data Object with Current Value
+      exp                  = abap_true    " Data Object with Expected Type
+      act                  = lv_ok   " Data Object with Current Value
     ).
 
   ENDMETHOD.
 
   METHOD genterate_gguid.
 
-    DATA: lv_gguid type SUID_UUID.
+    DATA: lv_gguid TYPE suid_uuid.
 
     lv_gguid = zcl_ebid=>get_gguid( ).
     cl_aunit_assert=>assert_not_initial(
-      EXPORTING
-        act              = lv_gguid    " Actual Data Object
+      act              = lv_gguid    " Actual Data Object
     ).
 
   ENDMETHOD.
@@ -85,36 +80,42 @@ CLASS ltcl_ebid IMPLEMENTATION.
     ls_match_req-company_name = 'OSRAM GmbH'.
 
     TRY.
-        lt_match_res = lo_ebid->match( ls_match_req ).
+        lo_ebid->match(
+          EXPORTING
+            is_match_request = ls_match_req
+          IMPORTING
+            rt_match_response = lt_match_res
+        ).
       CATCH zcx_ebid INTO DATA(ex).
         cl_aunit_assert=>assert_bound(
-          EXPORTING
-            act              = ex   " Reference Variable to Be Checked
+          act              = ex   " Reference Variable to Be Checked
         ).
     ENDTRY.
 
     ls_match_req-street       = 'Marcel-Breuer-Str. 6'.
     TRY.
-        lt_match_res = lo_ebid->match( ls_match_req ).
+        lo_ebid->match(
+          EXPORTING
+            is_match_request = ls_match_req
+          IMPORTING
+            rt_match_response = lt_match_res
+        ).
       CATCH zcx_ebid INTO ex.
         cl_aunit_assert=>assert_not_bound(
-          EXPORTING
-            act              = ex    " Reference Variable to Be Checked
-            msg              = ex->get_text( )   " Error Message
+          act              = ex    " Reference Variable to Be Checked
+          msg              = ex->get_text( )   " Error Message
         ).
     ENDTRY.
 
     cl_aunit_assert=>assert_not_initial(
-      EXPORTING
-        act              = lt_match_res   " Actual Data Object
+      act              = lt_match_res   " Actual Data Object
     ).
 
     DESCRIBE TABLE lt_match_res LINES DATA(lv_lines).
 
     cl_aunit_assert=>assert_equals(
-      EXPORTING
-        exp                  =  1   " Data Object with Expected Type
-        act                  =  lv_lines   " Data Object with Current Value
+      exp                  =  1   " Data Object with Expected Type
+      act                  =  lv_lines   " Data Object with Current Value
     ).
 
   ENDMETHOD.
@@ -129,8 +130,7 @@ CLASS ltcl_ebid IMPLEMENTATION.
         ls_company_res = lo_ebid->get_company( lv_ebid ).
       CATCH zcx_ebid INTO DATA(ex).
         cl_aunit_assert=>assert_bound(
-          EXPORTING
-            act              = ex   " Reference Variable to Be Checked
+          act              = ex   " Reference Variable to Be Checked
         ).
     ENDTRY.
 
@@ -138,46 +138,47 @@ CLASS ltcl_ebid IMPLEMENTATION.
     ls_company_res = lo_ebid->get_company( lv_ebid ).
 
     cl_aunit_assert=>assert_not_initial(
-      EXPORTING
-        act              = ls_company_res   " Actual Data Object
+      act              = ls_company_res   " Actual Data Object
     ).
 
   ENDMETHOD.
 
   METHOD search.
     DATA: ls_search_req TYPE zebid_match_request,
-          ls_search_res type zebid_search_response.
+          ls_search_res TYPE zebid_search_response.
 
     CREATE OBJECT lo_ebid.
     ls_search_req-company_name = 'Bosch Siemens'.
     ls_search_req-city         = 'München'.
 
-    ls_search_res = lo_ebid->search( ls_search_req ).
-
-    cl_aunit_assert=>assert_not_initial(
+    lo_ebid->search(
       EXPORTING
-        act              = ls_search_res   " Actual Data Object
+        is_search_request  = ls_search_req
+      IMPORTING
+        rs_search_response = ls_search_res
     ).
 
-    describe TABLE ls_search_res-suggestion lines data(lv_lines).
+    cl_aunit_assert=>assert_not_initial(
+      act              = ls_search_res   " Actual Data Object
+    ).
+
+    DESCRIBE TABLE ls_search_res-suggestion LINES DATA(lv_lines).
 
     cl_aunit_assert=>assert_equals(
-      EXPORTING
-        exp                  = 10    " Data Object with Expected Type
-        act                  = lv_lines    " Data Object with Current Value
+      exp                  = 10    " Data Object with Expected Type
+      act                  = lv_lines    " Data Object with Current Value
     ).
 
   ENDMETHOD.
 
   METHOD search_as_you_type.
-    data: lv_query type string VALUE 'OSRA'.
+    DATA: lv_query TYPE string VALUE 'OSRA'.
 
     CREATE OBJECT lo_ebid.
-    data(lt_result) = lo_ebid->search_as_you_type( lv_query ).
+    DATA(lt_result) = lo_ebid->search_as_you_type( lv_query ).
 
     cl_aunit_assert=>assert_not_initial(
-      EXPORTING
-        act              = lt_result   " Actual Data Object
+      act              = lt_result   " Actual Data Object
     ).
 
   ENDMETHOD.
