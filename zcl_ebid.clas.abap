@@ -10,10 +10,10 @@ CLASS zcl_ebid DEFINITION
     METHODS test_connection
       RETURNING VALUE(rv_ok) TYPE boolean
       RAISING
-        zcx_ebid.
+                zcx_ebid.
     METHODS match
       IMPORTING
-        is_match_request         TYPE zebid_match_request
+        is_match_request  TYPE zebid_match_request
       EXPORTING
         rt_match_response TYPE zebid_match_response_t
       RAISING
@@ -46,12 +46,12 @@ CLASS zcl_ebid DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    CONSTANTS: c_search_path  TYPE string VALUE '/ws/search/rest/v1.0/',
-               c_company_path TYPE string VALUE '/ws/company/rest/v1.0/',
-               c_test_path    TYPE string VALUE '/ws/match/rest/v1.0/authorization-test',
-               c_match_path   TYPE string VALUE '/ws/match/rest/v1.0/',
+    CONSTANTS: c_search_path             TYPE string VALUE '/ws/search/rest/v1.0/',
+               c_company_path            TYPE string VALUE '/ws/company/rest/v1.0/',
+               c_test_path               TYPE string VALUE '/ws/match/rest/v1.0/authorization-test',
+               c_match_path              TYPE string VALUE '/ws/match/rest/v1.0/',
                c_search_as_you_type_path TYPE string VALUE '/ws/search/rest/v2.0/search-as-you-type?q=',
-               c_http_status_200 TYPE i VALUE 200.
+               c_http_status_200         TYPE i VALUE 200.
     DATA destination TYPE pficf_destination_name.
     DATA http_client TYPE REF TO if_http_client.
     DATA rest_client TYPE REF TO cl_rest_http_client.
@@ -321,7 +321,9 @@ CLASS ZCL_EBID IMPLEMENTATION.
   METHOD search_as_you_type.
     DATA: lv_path TYPE string.
 
-    lv_path = c_search_as_you_type_path && iv_query.
+    lv_path = cl_http_utility=>escape_url( unescaped = iv_query ).
+
+    lv_path = c_search_as_you_type_path && lv_path.
 
     me->get( lv_path ).
     DATA(lv_status) = me->rest_client->if_rest_client~get_status( ).

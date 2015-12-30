@@ -181,6 +181,15 @@ CLASS ltcl_ebid IMPLEMENTATION.
       act              = lt_result   " Actual Data Object
     ).
 
+    clear: lt_result.
+
+    lv_query = 'SAP SE'.
+    lt_result = lo_ebid->search_as_you_type( lv_query ).
+    cl_aunit_assert=>assert_not_initial(
+      act              = lt_result   " Actual Data Object
+    ).
+
+
   ENDMETHOD.
 
 ENDCLASS.
