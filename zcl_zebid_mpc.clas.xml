@@ -49,5 +49,35 @@
    <ENTRY>Company Name</ENTRY>
    <LENGTH>132 </LENGTH>
   </TEXTPOOL>
+  <TEXTPOOL>
+   <ID>I</ID>
+   <KEY>002</KEY>
+   <ENTRY>City</ENTRY>
+   <LENGTH>132 </LENGTH>
+  </TEXTPOOL>
+  <TEXTPOOL>
+   <ID>I</ID>
+   <KEY>003</KEY>
+   <ENTRY>Country</ENTRY>
+   <LENGTH>132 </LENGTH>
+  </TEXTPOOL>
+  <TEXTPOOL>
+   <ID>I</ID>
+   <KEY>004</KEY>
+   <ENTRY>City Number</ENTRY>
+   <LENGTH>132 </LENGTH>
+  </TEXTPOOL>
+  <TEXTPOOL>
+   <ID>I</ID>
+   <KEY>005</KEY>
+   <ENTRY>City</ENTRY>
+   <LENGTH>132 </LENGTH>
+  </TEXTPOOL>
+  <TEXTPOOL>
+   <ID>I</ID>
+   <KEY>006</KEY>
+   <ENTRY>Language</ENTRY>
+   <LENGTH>132 </LENGTH>
+  </TEXTPOOL>
  </TEXTPOOL_TABLE>
 </abapGit>

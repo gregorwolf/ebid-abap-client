@@ -1,13 +1,13 @@
-CLASS zcl_zebid_dpc_ext DEFINITION
-  PUBLIC
-  INHERITING FROM zcl_zebid_dpc
-  CREATE PUBLIC .
+class ZCL_ZEBID_DPC_EXT definition
+  public
+  inheriting from ZCL_ZEBID_DPC
+  create public .
 
-  PUBLIC SECTION.
-  PROTECTED SECTION.
+public section.
+protected section.
 
-    METHODS searchasyoutypes_get_entityset
-         REDEFINITION .
+  methods SEARCHASYOUTYPES_GET_ENTITYSET
+    redefinition .
   PRIVATE SECTION.
 ENDCLASS.
 
