@@ -8,6 +8,8 @@ protected section.
 
   methods SEARCHASYOUTYPES_GET_ENTITYSET
     redefinition .
+  methods SIMPLESEARCHSET_GET_ENTITYSET
+    redefinition .
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -56,5 +58,36 @@ CLASS ZCL_ZEBID_DPC_EXT IMPLEMENTATION.
          ENDLOOP.
       ENDIF.
     ENDIF.
+  ENDMETHOD.
+
+
+  METHOD simplesearchset_get_entityset.
+    DATA: lo_ebid TYPE REF TO zcl_ebid.
+    DATA: ls_search_req TYPE zebid_match_request.
+
+    CREATE OBJECT lo_ebid.
+
+    LOOP AT it_filter_select_options
+     ASSIGNING FIELD-SYMBOL(<fs_filter_so>).
+      READ TABLE <fs_filter_so>-select_options
+        ASSIGNING FIELD-SYMBOL(<fs_so>) INDEX 1.
+      CASE <fs_filter_so>-property.
+        WHEN 'CompanyName'.
+          ls_search_req-company_name = <fs_so>-low.
+        WHEN 'City'.
+          ls_search_req-city = <fs_so>-low.
+      ENDCASE.
+    ENDLOOP.
+
+    lo_ebid->search(
+      EXPORTING
+        is_search_request  = ls_search_req
+      IMPORTING
+        rs_search_response = DATA(ls_search_res)
+    ).
+
+    LOOP AT ls_search_res-suggestion ASSIGNING FIELD-SYMBOL(<fs_suggestion>).
+      APPEND <fs_suggestion>-company TO et_entityset.
+    ENDLOOP.
   ENDMETHOD.
 ENDCLASS.

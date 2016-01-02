@@ -170,6 +170,79 @@ protected section.
     raising
       /IWBEP/CX_MGW_BUSI_EXCEPTION
       /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods SIMPLESEARCHSET_CREATE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_C optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IO_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
+    exporting
+      !ER_ENTITY type ZCL_ZEBID_MPC=>TS_SIMPLESEARCH
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods SIMPLESEARCHSET_DELETE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_D optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods SIMPLESEARCHSET_GET_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_REQUEST_OBJECT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+    exporting
+      !ER_ENTITY type ZCL_ZEBID_MPC=>TS_SIMPLESEARCH
+      !ES_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_ENTITY_CNTXT
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods SIMPLESEARCHSET_GET_ENTITYSET
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_FILTER_SELECT_OPTIONS type /IWBEP/T_MGW_SELECT_OPTION
+      !IS_PAGING type /IWBEP/S_MGW_PAGING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IT_ORDER type /IWBEP/T_MGW_SORTING_ORDER
+      !IV_FILTER_STRING type STRING
+      !IV_SEARCH_STRING type STRING
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITYSET optional
+    exporting
+      !ET_ENTITYSET type ZCL_ZEBID_MPC=>TT_SIMPLESEARCH
+      !ES_RESPONSE_CONTEXT type /IWBEP/IF_MGW_APPL_SRV_RUNTIME=>TY_S_MGW_RESPONSE_CONTEXT
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
+  methods SIMPLESEARCHSET_UPDATE_ENTITY
+    importing
+      !IV_ENTITY_NAME type STRING
+      !IV_ENTITY_SET_NAME type STRING
+      !IV_SOURCE_NAME type STRING
+      !IT_KEY_TAB type /IWBEP/T_MGW_NAME_VALUE_PAIR
+      !IO_TECH_REQUEST_CONTEXT type ref to /IWBEP/IF_MGW_REQ_ENTITY_U optional
+      !IT_NAVIGATION_PATH type /IWBEP/T_MGW_NAVIGATION_PATH
+      !IO_DATA_PROVIDER type ref to /IWBEP/IF_MGW_ENTRY_PROVIDER optional
+    exporting
+      !ER_ENTITY type ZCL_ZEBID_MPC=>TS_SIMPLESEARCH
+    raising
+      /IWBEP/CX_MGW_BUSI_EXCEPTION
+      /IWBEP/CX_MGW_TECH_EXCEPTION .
 
   methods CHECK_SUBSCRIPTION_AUTHORITY
     redefinition .
@@ -184,7 +257,7 @@ CLASS ZCL_ZEBID_DPC IMPLEMENTATION.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~CREATE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_CRT_ENTITY_BASE
-*&* This class has been generated on 31.12.2015 22:06:57 in client 001
+*&* This class has been generated on 02.01.2016 23:10:06 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -193,6 +266,7 @@ CLASS ZCL_ZEBID_DPC IMPLEMENTATION.
 
  DATA searchasyoutypes_create_entity TYPE zcl_zebid_mpc=>ts_searchasyoutype.
  DATA cityset_create_entity TYPE zcl_zebid_mpc=>ts_city.
+ DATA simplesearchset_create_entity TYPE zcl_zebid_mpc=>ts_simplesearch.
  DATA lv_entityset_name TYPE string.
 
 lv_entityset_name = io_tech_request_context->get_entity_set_name( ).
@@ -244,6 +318,29 @@ CASE lv_entityset_name.
         cr_data = er_entity
    ).
 
+*-------------------------------------------------------------------------*
+*             EntitySet -  simpleSearchSet
+*-------------------------------------------------------------------------*
+     WHEN 'simpleSearchSet'.
+*     Call the entity set generated method
+    simplesearchset_create_entity(
+         EXPORTING iv_entity_name     = iv_entity_name
+                   iv_entity_set_name = iv_entity_set_name
+                   iv_source_name     = iv_source_name
+                   io_data_provider   = io_data_provider
+                   it_key_tab         = it_key_tab
+                   it_navigation_path = it_navigation_path
+                   io_tech_request_context = io_tech_request_context
+       	 IMPORTING er_entity          = simplesearchset_create_entity
+    ).
+*     Send specific entity data to the caller interfaces
+    copy_data_to_ref(
+      EXPORTING
+        is_data = simplesearchset_create_entity
+      CHANGING
+        cr_data = er_entity
+   ).
+
   when others.
     super->/iwbep/if_mgw_appl_srv_runtime~create_entity(
        EXPORTING
@@ -263,7 +360,7 @@ ENDCASE.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~DELETE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_DEL_ENTITY_BASE
-*&* This class has been generated on 31.12.2015 22:06:57 in client 001
+*&* This class has been generated on 02.01.2016 23:10:06 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -303,6 +400,20 @@ CASE lv_entityset_name.
                     io_tech_request_context = io_tech_request_context
      ).
 
+*-------------------------------------------------------------------------*
+*             EntitySet -  simpleSearchSet
+*-------------------------------------------------------------------------*
+      when 'simpleSearchSet'.
+*     Call the entity set generated method
+     simplesearchset_delete_entity(
+          EXPORTING iv_entity_name     = iv_entity_name
+                    iv_entity_set_name = iv_entity_set_name
+                    iv_source_name     = iv_source_name
+                    it_key_tab         = it_key_tab
+                    it_navigation_path = it_navigation_path
+                    io_tech_request_context = io_tech_request_context
+     ).
+
    when others.
      super->/iwbep/if_mgw_appl_srv_runtime~delete_entity(
         EXPORTING
@@ -319,7 +430,7 @@ CASE lv_entityset_name.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITY.
 *&-----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_GETENTITY_BASE
-*&* This class has been generated  on 31.12.2015 22:06:57 in client 001
+*&* This class has been generated  on 02.01.2016 23:10:06 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -328,6 +439,7 @@ CASE lv_entityset_name.
 
  DATA searchasyoutypes_get_entity TYPE zcl_zebid_mpc=>ts_searchasyoutype.
  DATA cityset_get_entity TYPE zcl_zebid_mpc=>ts_city.
+ DATA simplesearchset_get_entity TYPE zcl_zebid_mpc=>ts_simplesearch.
  DATA lv_entityset_name TYPE string.
  DATA lr_entity TYPE REF TO data.
 
@@ -390,6 +502,34 @@ CASE lv_entityset_name.
 *         In case of initial values - unbind the entity reference
           er_entity = lr_entity.
         ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  simpleSearchSet
+*-------------------------------------------------------------------------*
+      WHEN 'simpleSearchSet'.
+*     Call the entity set generated method
+          simplesearchset_get_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = simplesearchset_get_entity
+                         es_response_context = es_response_context
+          ).
+
+        IF simplesearchset_get_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = simplesearchset_get_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
 
       WHEN OTHERS.
         super->/iwbep/if_mgw_appl_srv_runtime~get_entity(
@@ -409,7 +549,7 @@ CASE lv_entityset_name.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_ENTITYSET.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TMP_ENTITYSET_BASE
-*&* This class has been generated on 31.12.2015 22:06:57 in client 001
+*&* This class has been generated on 02.01.2016 23:10:06 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -417,6 +557,7 @@ CASE lv_entityset_name.
 *&-----------------------------------------------------------------------------------------------*
  DATA searchasyoutypes_get_entityset TYPE zcl_zebid_mpc=>tt_searchasyoutype.
  DATA cityset_get_entityset TYPE zcl_zebid_mpc=>tt_city.
+ DATA simplesearchset_get_entityset TYPE zcl_zebid_mpc=>tt_simplesearch.
  DATA lv_entityset_name TYPE string.
 
 lv_entityset_name = io_tech_request_context->get_entity_set_name( ).
@@ -482,6 +623,36 @@ CASE lv_entityset_name.
           cr_data = er_entityset
       ).
 
+*-------------------------------------------------------------------------*
+*             EntitySet -  simpleSearchSet
+*-------------------------------------------------------------------------*
+   WHEN 'simpleSearchSet'.
+*     Call the entity set generated method
+      simplesearchset_get_entityset(
+        EXPORTING
+         iv_entity_name = iv_entity_name
+         iv_entity_set_name = iv_entity_set_name
+         iv_source_name = iv_source_name
+         it_filter_select_options = it_filter_select_options
+         it_order = it_order
+         is_paging = is_paging
+         it_navigation_path = it_navigation_path
+         it_key_tab = it_key_tab
+         iv_filter_string = iv_filter_string
+         iv_search_string = iv_search_string
+         io_tech_request_context = io_tech_request_context
+       IMPORTING
+         et_entityset = simplesearchset_get_entityset
+         es_response_context = es_response_context
+       ).
+*     Send specific entity data to the caller interface
+      copy_data_to_ref(
+        EXPORTING
+          is_data = simplesearchset_get_entityset
+        CHANGING
+          cr_data = er_entityset
+      ).
+
     WHEN OTHERS.
       super->/iwbep/if_mgw_appl_srv_runtime~get_entityset(
         EXPORTING
@@ -505,7 +676,7 @@ CASE lv_entityset_name.
   method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~UPDATE_ENTITY.
 *&----------------------------------------------------------------------------------------------*
 *&  Include           /IWBEP/DPC_TEMP_UPD_ENTITY_BASE
-*&* This class has been generated on 31.12.2015 22:06:57 in client 001
+*&* This class has been generated on 02.01.2016 23:10:06 in client 001
 *&*
 *&*       WARNING--> NEVER MODIFY THIS CLASS <--WARNING
 *&*   If you want to change the DPC implementation, use the
@@ -514,6 +685,7 @@ CASE lv_entityset_name.
 
  DATA searchasyoutypes_update_entity TYPE zcl_zebid_mpc=>ts_searchasyoutype.
  DATA cityset_update_entity TYPE zcl_zebid_mpc=>ts_city.
+ DATA simplesearchset_update_entity TYPE zcl_zebid_mpc=>ts_simplesearch.
  DATA lv_entityset_name TYPE string.
  DATA lr_entity TYPE REF TO data.
 
@@ -567,6 +739,33 @@ CASE lv_entityset_name.
           copy_data_to_ref(
             EXPORTING
               is_data = cityset_update_entity
+            CHANGING
+              cr_data = er_entity
+          ).
+        ELSE.
+*         In case of initial values - unbind the entity reference
+          er_entity = lr_entity.
+        ENDIF.
+*-------------------------------------------------------------------------*
+*             EntitySet -  simpleSearchSet
+*-------------------------------------------------------------------------*
+      WHEN 'simpleSearchSet'.
+*     Call the entity set generated method
+          simplesearchset_update_entity(
+               EXPORTING iv_entity_name     = iv_entity_name
+                         iv_entity_set_name = iv_entity_set_name
+                         iv_source_name     = iv_source_name
+                         io_data_provider   = io_data_provider
+                         it_key_tab         = it_key_tab
+                         it_navigation_path = it_navigation_path
+                         io_tech_request_context = io_tech_request_context
+             	 IMPORTING er_entity          = simplesearchset_update_entity
+          ).
+       IF simplesearchset_update_entity IS NOT INITIAL.
+*     Send specific entity data to the caller interface
+          copy_data_to_ref(
+            EXPORTING
+              is_data = simplesearchset_update_entity
             CHANGING
               cr_data = er_entity
           ).
@@ -745,12 +944,12 @@ DATA lt_selopt TYPE ddshselops.
 DATA ls_selopt LIKE LINE OF lt_selopt.
 DATA ls_filter TYPE /iwbep/s_mgw_select_option.
 DATA ls_filter_range TYPE /iwbep/s_cod_select_option.
-DATA lr_langu LIKE RANGE OF ls_converted_keys-langu.
-DATA ls_langu LIKE LINE OF lr_langu.
-DATA lr_country LIKE RANGE OF ls_converted_keys-country.
-DATA ls_country LIKE LINE OF lr_country.
 DATA lr_mc_city LIKE RANGE OF ls_converted_keys-mc_city.
 DATA ls_mc_city LIKE LINE OF lr_mc_city.
+DATA lr_country LIKE RANGE OF ls_converted_keys-country.
+DATA ls_country LIKE LINE OF lr_country.
+DATA lr_langu LIKE RANGE OF ls_converted_keys-langu.
+DATA ls_langu LIKE LINE OF lr_langu.
 DATA lt_result_list TYPE /iwbep/if_sb_gendpc_shlp_data=>tt_result_list.
 DATA lv_next TYPE i VALUE 1.
 DATA ls_entityset LIKE LINE OF et_entityset.
@@ -804,19 +1003,19 @@ LOOP AT lt_filter_select_options INTO ls_filter.
 
   LOOP AT ls_filter-select_options INTO ls_filter_range.
     CASE ls_filter-property.
-      WHEN 'LANGU'.              " Equivalent to 'Language' property in the service
+      WHEN 'MC_CITY'.              " Equivalent to 'CityMatchCode' property in the service
         lo_filter->convert_select_option(
           EXPORTING
             is_select_option = ls_filter
           IMPORTING
-            et_select_option = lr_langu ).
+            et_select_option = lr_mc_city ).
 
-        LOOP AT lr_langu INTO ls_langu.
-          ls_selopt-sign = ls_langu-sign.
-          ls_selopt-option = ls_langu-option.
-          ls_selopt-low = ls_langu-low.
-          ls_selopt-high = ls_langu-high.
-          ls_selopt-shlpfield = 'LANGU'.
+        LOOP AT lr_mc_city INTO ls_mc_city.
+          ls_selopt-high = ls_mc_city-high.
+          ls_selopt-low = ls_mc_city-low.
+          ls_selopt-option = ls_mc_city-option.
+          ls_selopt-sign = ls_mc_city-sign.
+          ls_selopt-shlpfield = 'MC_CITY'.
           ls_selopt-shlpname = 'CITY_NAME'.
           APPEND ls_selopt TO lt_selopt.
           CLEAR ls_selopt.
@@ -829,28 +1028,28 @@ LOOP AT lt_filter_select_options INTO ls_filter.
             et_select_option = lr_country ).
 
         LOOP AT lr_country INTO ls_country.
-          ls_selopt-sign = ls_country-sign.
-          ls_selopt-option = ls_country-option.
-          ls_selopt-low = ls_country-low.
           ls_selopt-high = ls_country-high.
+          ls_selopt-low = ls_country-low.
+          ls_selopt-option = ls_country-option.
+          ls_selopt-sign = ls_country-sign.
           ls_selopt-shlpfield = 'COUNTRY'.
           ls_selopt-shlpname = 'CITY_NAME'.
           APPEND ls_selopt TO lt_selopt.
           CLEAR ls_selopt.
         ENDLOOP.
-      WHEN 'MC_CITY'.              " Equivalent to 'CityMatchCode' property in the service
+      WHEN 'LANGU'.              " Equivalent to 'Language' property in the service
         lo_filter->convert_select_option(
           EXPORTING
             is_select_option = ls_filter
           IMPORTING
-            et_select_option = lr_mc_city ).
+            et_select_option = lr_langu ).
 
-        LOOP AT lr_mc_city INTO ls_mc_city.
-          ls_selopt-sign = ls_mc_city-sign.
-          ls_selopt-option = ls_mc_city-option.
-          ls_selopt-low = ls_mc_city-low.
-          ls_selopt-high = ls_mc_city-high.
-          ls_selopt-shlpfield = 'MC_CITY'.
+        LOOP AT lr_langu INTO ls_langu.
+          ls_selopt-high = ls_langu-high.
+          ls_selopt-low = ls_langu-low.
+          ls_selopt-option = ls_langu-option.
+          ls_selopt-sign = ls_langu-sign.
+          ls_selopt-shlpfield = 'LANGU'.
           ls_selopt-shlpname = 'CITY_NAME'.
           APPEND ls_selopt TO lt_selopt.
           CLEAR ls_selopt.
@@ -908,16 +1107,16 @@ LOOP AT lt_result_list INTO ls_result_list
   " Move SH results to GW request responce table
   lv_next = sy-tabix + 1. " next loop iteration
   CASE ls_result_list-field_name.
-    WHEN 'MC_CITY'.
-      ls_entityset-mc_city = ls_result_list-field_value.
-    WHEN 'COUNTRY'.
-      ls_entityset-country = ls_result_list-field_value.
-    WHEN 'LANGU'.
-      ls_entityset-langu = ls_result_list-field_value.
-    WHEN 'CITY_NAME'.
-      ls_entityset-city_name = ls_result_list-field_value.
     WHEN 'CITY_CODE'.
       ls_entityset-city_code = ls_result_list-field_value.
+    WHEN 'CITY_NAME'.
+      ls_entityset-city_name = ls_result_list-field_value.
+    WHEN 'LANGU'.
+      ls_entityset-langu = ls_result_list-field_value.
+    WHEN 'COUNTRY'.
+      ls_entityset-country = ls_result_list-field_value.
+    WHEN 'MC_CITY'.
+      ls_entityset-mc_city = ls_result_list-field_value.
   ENDCASE.
 
   " Check if the next line in the result list is a new record
@@ -979,5 +1178,45 @@ ENDLOOP.
     EXPORTING
       textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
       method = 'SEARCHASYOUTYPES_UPDATE_ENTITY'.
+  endmethod.
+
+
+  method SIMPLESEARCHSET_CREATE_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'SIMPLESEARCHSET_CREATE_ENTITY'.
+  endmethod.
+
+
+  method SIMPLESEARCHSET_DELETE_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'SIMPLESEARCHSET_DELETE_ENTITY'.
+  endmethod.
+
+
+  method SIMPLESEARCHSET_GET_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'SIMPLESEARCHSET_GET_ENTITY'.
+  endmethod.
+
+
+  method SIMPLESEARCHSET_GET_ENTITYSET.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'SIMPLESEARCHSET_GET_ENTITYSET'.
+  endmethod.
+
+
+  method SIMPLESEARCHSET_UPDATE_ENTITY.
+  RAISE EXCEPTION TYPE /iwbep/cx_mgw_not_impl_exc
+    EXPORTING
+      textid = /iwbep/cx_mgw_not_impl_exc=>method_not_implemented
+      method = 'SIMPLESEARCHSET_UPDATE_ENTITY'.
   endmethod.
 ENDCLASS.
