@@ -9,3 +9,20 @@ To use this EBID ABAP client you have to register first at https://www.unternehm
 ## Installation
 
 Install abapGit from https://github.com/larshp/abapGit and then simply clone this project by running the ZABAPGIT report.
+
+## Status
+
+ABAP Class calling the services:
+
+* test conneciton
+* match
+* search
+* search as you type
+* company 
+
+are implemented. 
+
+The SAP Gateway service provides currently the services:
+
+* search as you type
+* search
