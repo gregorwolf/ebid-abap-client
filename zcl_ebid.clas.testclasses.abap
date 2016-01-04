@@ -169,6 +169,18 @@ CLASS ltcl_ebid IMPLEMENTATION.
       act                  = lv_lines    " Data Object with Current Value
     ).
 
+    CLEAR: ls_search_res.
+
+    ls_search_req-company_name = 'OSRAM GmbH'.
+    ls_search_req-city         = 'München'.
+
+    lo_ebid->search(
+      EXPORTING
+        is_search_request  = ls_search_req
+      IMPORTING
+        rs_search_response = ls_search_res
+    ).
+
   ENDMETHOD.
 
   METHOD search_as_you_type.
