@@ -7,42 +7,10 @@
     <VERSION>1</VERSION>
     <LANGU>E</LANGU>
     <DESCRIPT>ZCL_ZEBID_MPC</DESCRIPT>
-    <UUID/>
-    <CATEGORY>00</CATEGORY>
     <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
-    <RELEASE>0</RELEASE>
-    <AUTHOR/>
-    <CREATEDON>0000-00-00</CREATEDON>
-    <CHANGEDBY/>
-    <CHANGEDON>0000-00-00</CHANGEDON>
-    <CHGDANYBY/>
-    <CHGDANYON>0000-00-00</CHGDANYON>
-    <CLSEMBED/>
-    <CLSABSTRCT/>
-    <CLSFINAL/>
-    <CLSCCINCL/>
-    <REMOTE/>
     <FIXPT>X</FIXPT>
-    <VARCL/>
     <UNICODE>X</UNICODE>
-    <RSTAT/>
-    <CLSDEFATT/>
-    <CLSDEFMTD/>
-    <CLSDEFINT/>
-    <CLSBCIMPL/>
-    <R3RELEASE/>
-    <CLSBCTRANS/>
-    <CLSBCCAT>00</CLSBCCAT>
-    <CLSADDON/>
-    <MSG_ID/>
-    <CLSBCNODEL/>
-    <CLSPROXY/>
-    <CLSSHAREDMEMORY/>
-    <WITH_UNIT_TESTS/>
-    <DURATION_TYPE>0</DURATION_TYPE>
-    <RISK_LEVEL>0</RISK_LEVEL>
-    <WITHIN_PACKAGE/>
    </VSEOCLASS>
    <TPOOL>
     <item>
@@ -50,287 +18,246 @@
      <KEY>001</KEY>
      <ENTRY>Company Name</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>002</KEY>
      <ENTRY>City</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>003</KEY>
      <ENTRY>Country</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>004</KEY>
      <ENTRY>City Number</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>005</KEY>
      <ENTRY>City</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>006</KEY>
      <ENTRY>Language</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>007</KEY>
      <ENTRY>FACEBOOK</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>008</KEY>
      <ENTRY>GOOGLEPLUS</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>009</KEY>
      <ENTRY>TWITTER</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>010</KEY>
      <ENTRY>LINKEDIN</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>011</KEY>
      <ENTRY>XING</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>012</KEY>
      <ENTRY>FOURSQUARE</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>013</KEY>
      <ENTRY>YOUTUBE</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>014</KEY>
      <ENTRY>BIZID</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>015</KEY>
      <ENTRY>EBID</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>016</KEY>
      <ENTRY>COMPANY_NAME</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>017</KEY>
      <ENTRY>COMPANY_FORM</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>018</KEY>
      <ENTRY>STREET</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>019</KEY>
      <ENTRY>HOUSE_NO</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>020</KEY>
      <ENTRY>CITY</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>021</KEY>
      <ENTRY>CITY_PART</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>022</KEY>
      <ENTRY>ZIP</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>023</KEY>
      <ENTRY>COUNTRY</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>024</KEY>
      <ENTRY>PHONE</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>025</KEY>
      <ENTRY>FAX</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>026</KEY>
      <ENTRY>MOBILE</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>027</KEY>
      <ENTRY>POBOX</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>028</KEY>
      <ENTRY>POBOX_CITY</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>029</KEY>
      <ENTRY>EMAIL</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>030</KEY>
      <ENTRY>URL</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>031</KEY>
      <ENTRY>HR_TYPE</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>032</KEY>
      <ENTRY>HR_NR</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>033</KEY>
      <ENTRY>COURT</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>034</KEY>
      <ENTRY>UST_ID_NR</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>035</KEY>
      <ENTRY>X_COORD</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>036</KEY>
      <ENTRY>Y_COORD</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>037</KEY>
      <ENTRY>OUT_OF_MARKET</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>038</KEY>
      <ENTRY>LAST_CHANGE</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>039</KEY>
      <ENTRY>LAST_CHANGE_ISO</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>040</KEY>
      <ENTRY>LAST_CHECK</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
     <item>
      <ID>I</ID>
      <KEY>041</KEY>
      <ENTRY>LAST_CHECK_ISO</ENTRY>
      <LENGTH>132</LENGTH>
-     <SPLIT/>
     </item>
    </TPOOL>
   </asx:values>
